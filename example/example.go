@@ -1,7 +1,7 @@
-package main
+package example
 
 import "log"
 
-func main() {
+func HelloWorld() {
 	log.Println("Hello, world")
 }
