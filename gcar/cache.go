@@ -10,3 +10,8 @@ type Item struct {
 func Set() (string, bool) {
 	return "Hello, World", true
 }
+
+// Get should be get cache data from memory
+func Get() (string, bool) {
+	return "Hello, World", true
+}
