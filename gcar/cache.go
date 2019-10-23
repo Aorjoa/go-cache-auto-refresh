@@ -15,7 +15,7 @@ type cache struct {
 // New is using for inital cache
 func New() Cache {
 	var mrw sync.RWMutex
-	var items map[string]interface{}
+	var items = make(map[string]interface{})
 	return Cache{
 		&cache{
 			mu:    &mrw,
