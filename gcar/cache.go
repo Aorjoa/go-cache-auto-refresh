@@ -7,6 +7,9 @@ type Cache struct {
 	*cache
 }
 
+// CallFunction is type for function that we suppose to cache when process done
+type CallFunction func() (interface{}, error)
+
 type cache struct {
 	mu    *sync.RWMutex
 	items map[string]interface{}
@@ -40,4 +43,15 @@ func (c *Cache) Get(k string) (interface{}, bool) {
 		return nil, false
 	}
 	return item, true
+}
+
+// CallFunctionThenCache is using for call function that return interface{} and error
+// then cache it
+// !!! its NOT concurrecy safe for now !!!
+func (c *Cache) CallFunctionThenCache(k string, cf CallFunction) {
+	resp, err := cf()
+	if err != nil {
+		return
+	}
+	c.Set(k, resp)
 }
