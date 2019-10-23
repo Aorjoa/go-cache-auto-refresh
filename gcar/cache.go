@@ -4,8 +4,24 @@ import "sync"
 
 // Cache use for construct model to store cache
 type Cache struct {
-	mu    sync.RWMutex
+	*cache
+}
+
+type cache struct {
+	mu    *sync.RWMutex
 	items map[string]interface{}
+}
+
+// New is using for inital cache
+func New() Cache {
+	var mrw sync.RWMutex
+	var items map[string]interface{}
+	return Cache{
+		&cache{
+			mu:    &mrw,
+			items: items,
+		},
+	}
 }
 
 // Set should be set cache to memory
