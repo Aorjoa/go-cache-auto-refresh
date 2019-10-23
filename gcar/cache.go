@@ -9,8 +9,10 @@ type Cache struct {
 }
 
 // Set should be set cache to memory
-func Set() (string, bool) {
-	return "Hello, World", true
+func (c *Cache) Set(k string, v interface{}) {
+	c.mu.Lock()
+	c.items[k] = v
+	c.mu.Unlock()
 }
 
 // Get should be get cache data from memory
