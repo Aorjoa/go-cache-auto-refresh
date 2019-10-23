@@ -39,5 +39,6 @@ func (c *Cache) Get(k string) (interface{}, bool) {
 		c.mu.RUnlock()
 		return nil, false
 	}
+	c.mu.RUnlock()
 	return item, true
 }
