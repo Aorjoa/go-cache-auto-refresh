@@ -49,7 +49,7 @@ func (c *Cache) Get(k string) (interface{}, bool) {
 // CallFunctionThenCache is using for call function that return interface{} and error
 // then cache it
 // !!! its NOT concurrecy safe for now !!!
-func (c *Cache) CallFunctionThenCache(k string, cf CallFunction) {
+func (c *Cache) PeriodicCache(k string, cf CallFunction) {
 	resp, err := cf()
 	if err != nil {
 		return
