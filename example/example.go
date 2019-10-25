@@ -5,6 +5,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/aorjoa/go-cache-auto-refresh/gcar"
 )
@@ -27,6 +30,11 @@ func main() {
 	}
 	log.Printf("try to add cache [keyAPI] : %v", val)
 
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	<-shutdown
+	log.Println("good bye.")
 }
 
 func caller() func() (interface{}, error) {
