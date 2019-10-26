@@ -9,42 +9,70 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
-	"github.com/aorjoa/go-cache-auto-refresh/gcar"
 )
 
-func main() {
-	cache := gcar.New()
-	// simple
-	cache.Set("key", "value")
-	val, ok := cache.Get("key")
-	if !ok {
-		log.Print("something went wrong")
-	}
-	log.Printf("try to add cache [key] : %v", val)
+// var loaderFunc = map[string]func(pipeCh chan *Cache){
+// 	"myip": func(pipeCh chan *Cache) {
+// 		fmt.Println("take out pipeCh")
+// 		cc := <-pipeCh
+// 		cc.Update("myip", "it's works!!!!! myip")
+// 		pipeCh <- cc
+// 		fmt.Println("put in pipeCh")
+// 	},
+// }
 
-	// call function then cache
-	cache.PeriodicCache("keyAPI", caller)
-	val, ok = cache.Get("keyAPI")
-	if !ok {
-		log.Print("something went wrong")
+type Cache struct{ item map[string]interface{} }
+
+func update1(key string, pipe chan *Cache) {
+	i := 0
+	for {
+		ball := <-pipe
+		ball.item[key] = fmt.Sprintf("update key:%s=%d", key, i)
+		i++
+		pipe <- ball
 	}
-	log.Printf("try to add cache [keyAPI] : %v", val)
-	cacheJanitor := gcar.New()
-	cacheJanitor.PeriodicCache("keyAPIJanitor", caller)
-	go func() {
-		for {
-			nextTime := time.Now().Truncate(1 * time.Second)
-			nextTime = nextTime.Add(1 * time.Second)
-			time.Sleep(time.Until(nextTime))
-			val, ok := cacheJanitor.Get("keyAPIJanitor")
-			if !ok {
-				continue
-			}
-			log.Printf("<><> %v", val)
-			break
-		}
-	}()
+}
+
+func update2(key string, pipe chan *Cache) {
+	i := 111
+	for {
+		ball := <-pipe
+		ball.item[key] = fmt.Sprintf("udpate2 key:%s=%d", key, i)
+		i++
+		pipe <- ball
+	}
+}
+
+func getCache(key string, pipe chan *Cache) {
+	select {
+	case ball := <-pipe:
+		fmt.Println("get ball:", ball.item[key])
+		pipe <- ball
+	}
+}
+
+func main() {
+	pipe := make(chan *Cache)
+	go update1("myip", pipe)
+	go update2("name", pipe)
+
+	pipe <- &Cache{
+		item: map[string]interface{}{"name": "anuchito"},
+	}
+
+	for i := 0; i < 10; i++ {
+		getCache("myip", pipe)
+		getCache("name", pipe)
+		getCache("myip", pipe)
+		getCache("name", pipe)
+		getCache("myip", pipe)
+		getCache("name", pipe)
+		getCache("myip", pipe)
+		getCache("name", pipe)
+		getCache("myip", pipe)
+		getCache("name", pipe)
+		time.Sleep(1 * time.Second)
+	}
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
