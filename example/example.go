@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/aorjoa/go-cache-auto-refresh/gcar"
 )
@@ -23,12 +24,27 @@ func main() {
 	log.Printf("try to add cache [key] : %v", val)
 
 	// call function then cache
-	cache.CallFunctionThenCache("keyAPI", caller)
+	cache.PeriodicCache("keyAPI", caller)
 	val, ok = cache.Get("keyAPI")
 	if !ok {
 		log.Print("something went wrong")
 	}
 	log.Printf("try to add cache [keyAPI] : %v", val)
+	cacheJanitor := gcar.New()
+	cacheJanitor.PeriodicCache("keyAPIJanitor", caller)
+	go func() {
+		for {
+			nextTime := time.Now().Truncate(1 * time.Second)
+			nextTime = nextTime.Add(1 * time.Second)
+			time.Sleep(time.Until(nextTime))
+			val, ok := cacheJanitor.Get("keyAPIJanitor")
+			if !ok {
+				continue
+			}
+			log.Printf("<><> %v", val)
+			break
+		}
+	}()
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
