@@ -30,4 +30,17 @@ func TestGet(t *testing.T) {
 		assert.True(t, ok)
 		assert.Equal(t, "AnuchitO", value)
 	})
+
+	t.Run("Should be return nil, false for not found item", func(t *testing.T) {
+		c := &gCache{
+			items: map[string]interface{}{},
+		}
+		pipe := make(chan *gCache, 1)
+		pipe <- c
+
+		value, ok := get("nokey", pipe)
+
+		assert.Nil(t, value)
+		assert.False(t, ok)
+	})
 }
