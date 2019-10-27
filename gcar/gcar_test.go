@@ -44,3 +44,18 @@ func TestGet(t *testing.T) {
 		assert.False(t, ok)
 	})
 }
+
+func TestSet(t *testing.T) {
+	t.Run("should set value into cache object by using a key", func(t *testing.T) {
+		old := &gCache{
+			items: map[string]interface{}{},
+		}
+		pipe := make(chan *gCache, 1)
+		pipe <- old
+
+		set("name", "AnuchitO", pipe)
+		fresh := <-pipe
+
+		assert.Equal(t, "AnuchitO", fresh.items["name"])
+	})
+}

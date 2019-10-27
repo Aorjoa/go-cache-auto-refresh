@@ -32,10 +32,14 @@ func get(key string, pipe chan *gCache) (value interface{}, isExist bool) {
 }
 
 func Set(key string, value interface{}) {
+	set(key, value, pipeline)
+}
+
+func set(key string, value interface{}, pipe chan *gCache) {
 	select {
-	case c := <-pipeline:
+	case c := <-pipe:
 		c.set(key, value)
-		pipeline <- c
+		pipe <- c
 	}
 }
 
