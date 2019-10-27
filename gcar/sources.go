@@ -17,21 +17,6 @@ func initSources(sourcePipe chan sources) {
 }
 
 type Source func() (interface{}, error)
-type updater func(chan *gCache)
-
-type gCache struct {
-	items map[string]interface{}
-}
-
-func (gc *gCache) set(key string, value interface{}) {
-	gc.items[key] = value
-}
-
-type sources map[string]updater
-
-func (s sources) set(key string, f updater) {
-	s[key] = f
-}
 
 // Add is register a function get Source of value
 // when calll Add it will excute Source function to get value for first time.
@@ -84,4 +69,20 @@ func UpdateTick(d time.Duration) {
 			}
 		}
 	}(d)
+}
+
+type updater func(chan *gCache)
+
+type gCache struct {
+	items map[string]interface{}
+}
+
+func (gc *gCache) set(key string, value interface{}) {
+	gc.items[key] = value
+}
+
+type sources map[string]updater
+
+func (s sources) set(key string, f updater) {
+	s[key] = f
 }
