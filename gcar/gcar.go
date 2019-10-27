@@ -7,12 +7,15 @@ import (
 
 var pipeline = make(chan *gCache, 1)
 
-type gCache struct {
-	items map[string]interface{}
+func init() {
+	initializer(pipeline)
 }
 
-func (gc *gCache) set(key string, value interface{}) {
-	gc.items[key] = value
+func initializer(pipe chan *gCache) {
+	gc := &gCache{
+		items: map[string]interface{}{},
+	}
+	pipe <- gc
 }
 
 func Get(key string) (value interface{}, isExist bool) {
@@ -35,15 +38,16 @@ func Set(key string, value interface{}) {
 // TODO: with context - timeout
 // func GetWithContext(ctx context.Context) {}
 
-func init() {
-	gc := &gCache{
-		items: map[string]interface{}{},
-	}
-	pipeline <- gc
-}
-
 type Source func() (interface{}, error)
 type updater func(chan *gCache)
+
+type gCache struct {
+	items map[string]interface{}
+}
+
+func (gc *gCache) set(key string, value interface{}) {
+	gc.items[key] = value
+}
 
 var ff = map[string]updater{}
 
@@ -51,7 +55,11 @@ var ff = map[string]updater{}
 // when calll Add it will excute Source function to get value for first time.
 func Add(key string, s Source) {
 	f := wrapper(key, s)
-	defer f(pipeline)
+	add(key, f, pipeline)
+}
+
+func add(key string, f updater, pipe chan *gCache) {
+	defer f(pipe)
 	ff[key] = f
 }
 
