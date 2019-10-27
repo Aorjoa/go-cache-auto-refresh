@@ -13,12 +13,16 @@ import (
 	"github.com/aorjoa/go-cache-auto-refresh/gcar"
 )
 
+// Example struct call get
+
 func main() {
 	gcar.Add("nong", func() (interface{}, error) {
 		return "anuchitO", nil
 	})
 	gcar.Add("myip", caller)
-	gcar.Set("myip", "dummy ip")
+	gcar.Add("myip1", caller)
+	gcar.Add("myip2", caller)
+	gcar.Set("myip4", "dummyIP")
 
 	v, ok := gcar.Get("nong")
 	fmt.Println("nong:", v, "found:", ok)
@@ -38,6 +42,7 @@ func main() {
 }
 
 func caller() (interface{}, error) {
+	fmt.Println("caller")
 	response, err := http.Get("https://httpbin.org/ip")
 	if err != nil {
 		fmt.Printf("The HTTP request failed with error %s\n", err)
