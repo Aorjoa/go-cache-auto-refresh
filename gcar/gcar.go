@@ -19,10 +19,14 @@ func initializer(pipe chan *gCache) {
 }
 
 func Get(key string) (value interface{}, isExist bool) {
+	return get(key, pipeline)
+}
+
+func get(key string, pipe chan *gCache) (value interface{}, isExist bool) {
 	select {
-	case c := <-pipeline:
+	case c := <-pipe:
 		value, isExist = c.items[key]
-		pipeline <- c
+		pipe <- c
 		return
 	}
 }

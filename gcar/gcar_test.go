@@ -16,3 +16,18 @@ func TestInitializer(t *testing.T) {
 		assert.NotNil(t, c.items)
 	})
 }
+
+func TestGet(t *testing.T) {
+	t.Run("Should be return value from by key", func(t *testing.T) {
+		c := &gCache{
+			items: map[string]interface{}{"name": "AnuchitO"},
+		}
+		pipe := make(chan *gCache, 1)
+		pipe <- c
+
+		value, ok := get("name", pipe)
+
+		assert.True(t, ok)
+		assert.Equal(t, "AnuchitO", value)
+	})
+}
