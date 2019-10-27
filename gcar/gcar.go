@@ -5,13 +5,7 @@ import (
 	"time"
 )
 
-// select {
-// case ball := <-pipe:
-// 	fmt.Println("get ball:", ball.item[key])
-// 	pipe <- ball
-// }
-
-var pipeline = make(chan *gCache)
+var pipeline = make(chan *gCache, 1)
 
 type gCache struct {
 	items map[string]interface{}
@@ -30,8 +24,17 @@ func Get(key string) (value interface{}, isExist bool) {
 	}
 }
 
+// TODO: add function set
+
 // TODO: with context - timeout
 // func GetWithContext(ctx context.Context) {}
+
+func init() {
+	gc := &gCache{
+		items: map[string]interface{}{},
+	}
+	pipeline <- gc
+}
 
 type Source func() (interface{}, error)
 type updater func(chan *gCache)
@@ -39,14 +42,16 @@ type updater func(chan *gCache)
 var ff = map[string]updater{}
 
 func Add(key string, s Source) {
-	ff[key] = wrapper(key, s)
+	f := wrapper(key, s)
+	defer f(pipeline)
+	ff[key] = f
 }
 
 func wrapper(key string, s Source) updater {
 	return func(pipe chan *gCache) {
 		value, err := s()
 		if err != nil {
-			// TODO: refactor
+			// TODO: refactor handler error
 			log.Println("not update date: because retrive date error key:", key, ",error:", err)
 			return
 		}
