@@ -11,7 +11,7 @@ type gCache struct {
 	items map[string]interface{}
 }
 
-func (gc *gCache) update(key string, value interface{}) {
+func (gc *gCache) set(key string, value interface{}) {
 	gc.items[key] = value
 }
 
@@ -27,7 +27,7 @@ func Get(key string) (value interface{}, isExist bool) {
 func Set(key string, value interface{}) {
 	select {
 	case c := <-pipeline:
-		c.items[key] = value
+		c.set(key, value)
 		pipeline <- c
 	}
 }
@@ -66,7 +66,7 @@ func wrapper(key string, s Source) updater {
 
 		select {
 		case c := <-pipe:
-			c.update(key, value)
+			c.set(key, value)
 			pipe <- c
 		}
 	}
