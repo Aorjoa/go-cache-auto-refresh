@@ -24,7 +24,13 @@ func Get(key string) (value interface{}, isExist bool) {
 	}
 }
 
-// TODO: add function set
+func Set(key string, value interface{}) {
+	select {
+	case c := <-pipeline:
+		c.items[key] = value
+		pipeline <- c
+	}
+}
 
 // TODO: with context - timeout
 // func GetWithContext(ctx context.Context) {}
@@ -41,6 +47,8 @@ type updater func(chan *gCache)
 
 var ff = map[string]updater{}
 
+// Add is register a function get Source of value
+// when calll Add it will excute Source function to get value for first time.
 func Add(key string, s Source) {
 	f := wrapper(key, s)
 	defer f(pipeline)
@@ -64,6 +72,7 @@ func wrapper(key string, s Source) updater {
 	}
 }
 
+// UpdateTick is update new data from Source every duration it take.
 func UpdateTick(d time.Duration) {
 	// TODO: extract to private function
 	go func(d time.Duration) {

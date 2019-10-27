@@ -14,37 +14,21 @@ import (
 )
 
 func main() {
-	cache := gcar.New()
-	// simple
-	cache.Set("key", "value")
-	val, ok := cache.Get("key")
-	if !ok {
-		log.Print("something went wrong")
-	}
-	log.Printf("try to add cache [key] : %v", val)
+	gcar.Add("nong", func() (interface{}, error) {
+		return "anuchitO", nil
+	})
+	gcar.Add("myip", caller)
+	gcar.Set("myip", "dummy ip")
 
-	// call function then cache
-	cache.PeriodicCache("keyAPI", caller)
-	val, ok = cache.Get("keyAPI")
-	if !ok {
-		log.Print("something went wrong")
-	}
-	log.Printf("try to add cache [keyAPI] : %v", val)
-	cacheJanitor := gcar.New()
-	cacheJanitor.PeriodicCache("keyAPIJanitor", caller)
-	go func() {
-		for {
-			nextTime := time.Now().Truncate(1 * time.Second)
-			nextTime = nextTime.Add(1 * time.Second)
-			time.Sleep(time.Until(nextTime))
-			val, ok := cacheJanitor.Get("keyAPIJanitor")
-			if !ok {
-				continue
-			}
-			log.Printf("<><> %v", val)
-			break
-		}
-	}()
+	v, ok := gcar.Get("nong")
+	fmt.Println("nong:", v, "found:", ok)
+	v, ok = gcar.Get("myip")
+	fmt.Println("myip:", v, "found:", ok)
+
+	gcar.UpdateTick(800 * time.Millisecond)
+	time.Sleep(5 * time.Second)
+	v, ok = gcar.Get("myip")
+	fmt.Println("myip:", v, "found:", ok)
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
