@@ -8,8 +8,12 @@ import (
 var sourcePipeline = make(chan sources, 1)
 
 func init() {
+	initSources(sourcePipeline)
+}
+
+func initSources(sourcePipe chan sources) {
 	ss := sources{}
-	sourcePipeline <- ss
+	sourcePipe <- ss
 }
 
 type Source func() (interface{}, error)
