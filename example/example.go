@@ -13,6 +13,8 @@ import (
 	"github.com/aorjoa/go-cache-auto-refresh/gcar"
 )
 
+// Example struct call get
+
 func main() {
 	gcar.Add("nong", func() (interface{}, error) {
 		return "anuchitO", nil
