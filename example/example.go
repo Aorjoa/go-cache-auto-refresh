@@ -9,6 +9,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/aorjoa/go-cache-auto-refresh/gcar"
 )
 
 func main() {
