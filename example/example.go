@@ -42,6 +42,7 @@ func main() {
 }
 
 func caller() (interface{}, error) {
+	fmt.Println("caller")
 	response, err := http.Get("https://httpbin.org/ip")
 	if err != nil {
 		fmt.Printf("The HTTP request failed with error %s\n", err)
