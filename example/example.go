@@ -20,7 +20,9 @@ func main() {
 		return "anuchitO", nil
 	})
 	gcar.Add("myip", caller)
-	gcar.Set("myip", "dummy ip")
+	gcar.Add("myip1", caller)
+	gcar.Add("myip2", caller)
+	gcar.Set("myip4", "dummyIP")
 
 	v, ok := gcar.Get("nong")
 	fmt.Println("nong:", v, "found:", ok)
