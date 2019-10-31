@@ -7,3 +7,11 @@ Please run unittest with timeout
 ```
 go test -timeout 300ms -v ./...
 ```
+
+# Document
+
+```
+godoc -ex -http=:6060
+```
+
+http://localhost:6060/pkg/github.com/pallat/go-cache-auto-refresh/gcar/

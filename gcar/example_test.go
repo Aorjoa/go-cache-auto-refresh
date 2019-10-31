@@ -1,4 +1,4 @@
-package main
+package gcar_test
 
 import (
 	"fmt"
@@ -13,9 +13,7 @@ import (
 	"github.com/aorjoa/go-cache-auto-refresh/gcar"
 )
 
-// Example struct call get
-
-func main() {
+func Example() {
 	gcar.Add("nong", func() (interface{}, error) {
 		return "anuchitO", nil
 	})
