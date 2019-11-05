@@ -45,15 +45,3 @@ func (c *Cache) Get(k string) (interface{}, bool) {
 	c.mu.RUnlock()
 	return item, true
 }
-
-// CallFunctionThenCache is using for call function that return interface{} and error
-// then cache it
-// !!! its NOT concurrecy safe for now !!!
-// periodically
-func (c *Cache) PeriodicCache(k string, cf CallFunction) {
-	resp, err := cf()
-	if err != nil {
-		return
-	}
-	c.Set(k, resp)
-}
